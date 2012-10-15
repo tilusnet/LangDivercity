@@ -1,13 +1,48 @@
 class Cities {
-  private ArrayList<LatLong> cities;
+  private ArrayList<CityData> cities;
   private String dbgMyName;
+  private 
   
+  class CityData {
+    private String name;
+    private LatLong loc;
+    private color col;
+    private int bs;
+    private int maxBs;
+    CityData(String name, LatLong loc, color col, int barSize, int maxBarSize) {
+      this.name = name;
+      this.loc = loc;
+      this.col = col;
+      this.bs = barSize;
+      this.maxBs = maxBarSize;
+    }
+    LatLong getLocation() {
+      return loc;
+    }
+    color getColour() {
+      return col;
+    } 
+    void incBS() {
+      if (bs < maxBs)
+        bs++;
+    }
+    void incBS(int increment) {
+      if (bs + increment < maxBs)
+        bs += increment;
+      else
+        bs = maxBs; 
+    }
+    int getBS() {
+      return bs;
+    }
+  }
   
   Cities() {
-    cities = new ArrayList<LatLong>();
-    cities.add(new LatLong(52, 13));         // Berlin
-    cities.add(new LatLong(-33.86, 151.21)); // Sydney
-    cities.add(new LatLong(37.8, -122.4));   // San Francisco
+    int bs = 2;
+    cities = new ArrayList<CityData>();
+    cities.add(new CityData("Berlin", new LatLong(52, 13),         #990000, bs, 400)); // Berlin
+    cities.add(new CityData("Sydney", new LatLong(-33.86, 151.21), #009900, bs, 200)); // Sydney
+    cities.add(new CityData("San Francisco", new LatLong(37.8, -122.4),   #000099, bs, 300)); // San Francisco
     dbgMyName = this.getClass().getName() + "::";
   }
   
@@ -17,9 +52,17 @@ class Cities {
     fill(255, 0, 0, 200);
     translate(0, 0, 0.01);
     
-    for (LatLong cityLL: cities) {
+    for (CityData cdata: cities) {
+      LatLong cityLL = cdata.getLocation();
       cityXY = mm.getScreenLocation(new PVector(cityLL.getLat(), cityLL.getLong()));
-      ellipse(cityXY.x, cityXY.y, 2, 2);
+
+      pushMatrix();
+      translate(cityXY.x, cityXY.y, cdata.getBS()/2);
+      fill(cdata.getColour());
+      box(1,1,cdata.getBS());
+      cdata.incBS();
+      popMatrix();
+
       dbgPrintCityLocation(cityLL, cityXY);
     }
     
