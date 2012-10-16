@@ -17,6 +17,8 @@ void setup() {
   size(screenSizeX, screenSizeY, P3D);
   // smooth();
   
+  hint(ENABLE_STROKE_PERSPECTIVE);
+  
   myUim = new UIManager(drawAreaSizeX, drawAreaSizeY);
   myMap = new WorldMap3D(drawAreaSizeX, drawAreaSizeY, 4000);
   myCities = new Cities();
