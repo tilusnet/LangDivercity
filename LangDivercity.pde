@@ -16,7 +16,7 @@ int drawAreaSizeY = drawAreaSizeX;
 
 void setup() {
   size(screenSizeX, screenSizeY, P3D);
-  // smooth();
+  smooth();
   
   hint(ENABLE_STROKE_PERSPECTIVE);
   
