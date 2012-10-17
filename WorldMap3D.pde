@@ -1,6 +1,6 @@
 class WorldMap3D {
   private PImage tex;
-  private PShape wmap;
+  private PShape wmap, wmap2;
   private int mapBitmapSizeX;
   private MercatorMap mercMap; 
   
@@ -25,6 +25,7 @@ class WorldMap3D {
     
     textureMode(NORMAL);
     wmap = create2DMap(mapSizeX, mapSizeY);
+    wmap2 = create2DMap(mapSizeX, mapSizeY, 200);
     // wmap = createCubeMap();
     
     mercMap = new MercatorMap(-(mapSizeX/2.0), -(mapSizeY/2.0), mapSizeX, mapSizeY, 85.0511, -85.0511, -180, 180); 
@@ -36,14 +37,19 @@ class WorldMap3D {
   }
 
   private PShape create2DMap(int mapSizeX, int mapSizeY) {
+    return create2DMap(mapSizeX, mapSizeY, 0);
+  }
+
+
+  private PShape create2DMap(int mapSizeX, int mapSizeY, int zCoord) {
     PShape m2d = createShape(QUADS);
     float halfX = mapSizeX/2.0;
     float halfY = mapSizeY/2.0;
     m2d.texture(tex);
-    m2d.vertex(-halfX, -halfY,  0,   0,   0);
-    m2d.vertex( halfX, -halfY,  0,   1,   0);
-    m2d.vertex( halfX,  halfY,  0,   1,   1);
-    m2d.vertex(-halfX,  halfY,  0,   0,   1);
+    m2d.vertex(-halfX, -halfY,  zCoord,   0,   0);
+    m2d.vertex( halfX, -halfY,  zCoord,   1,   0);
+    m2d.vertex( halfX,  halfY,  zCoord,   1,   1);
+    m2d.vertex(-halfX,  halfY,  zCoord,   0,   1);
     m2d.end(CLOSE);
     
     return m2d;
@@ -97,6 +103,7 @@ class WorldMap3D {
   
   void update() {
     shape(wmap);
+    shape(wmap2);
   }
   
   void setTint(int col, int al) {

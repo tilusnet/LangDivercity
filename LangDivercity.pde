@@ -6,6 +6,7 @@ UIManager   myUim;
 WorldMap3D  myMap;
 MercatorMap mercMap;
 Cities      myCities;
+skDB        mySkDB;
 
 int screenSizeX = 800;
 int screenSizeY = 600;
@@ -26,6 +27,8 @@ void setup() {
   myMap.setTint(255, 150);
   
   mercMap = myMap.getMercatorMap();
+  
+  mySkDB = new skDB(this, "skdownl-ip.sqlite");
   
 }
 
