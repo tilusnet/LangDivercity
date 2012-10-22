@@ -93,6 +93,18 @@ class UIManager {
     update();
   } 
   
+  void positionOnLondon() {
+    
+    offsX = 79;
+    offsY = 346;
+    rotX = 0.265;
+    rotY = -0.194;
+    zoomScale = 1.41;
+  
+    update();
+  } 
+
+
   void setInitialTranslate() {
     // translate(initialTx, initialTy, 0);
     translate(width/2.0, height/2.0, 0);

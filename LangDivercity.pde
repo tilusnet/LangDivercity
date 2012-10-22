@@ -15,7 +15,7 @@ int drawAreaSizeY = drawAreaSizeX;
 
 
 void setup() {
-  size(screenSizeX, screenSizeY, P3D);
+  size(screenSizeX, screenSizeY, OPENGL);
   smooth();
   
   hint(ENABLE_STROKE_PERSPECTIVE);
@@ -24,6 +24,7 @@ void setup() {
   myMap = new WorldMap3D(drawAreaSizeX, drawAreaSizeY, 4000);
   myCities = new Cities();
   // myUim.positionOnEurope(myMap.getMapSizeX());
+  myUim.positionOnLondon();
   myMap.setTint(255, 150);
   
   mercMap = myMap.getMercatorMap();

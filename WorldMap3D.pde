@@ -25,7 +25,7 @@ class WorldMap3D {
     
     textureMode(NORMAL);
     wmap = create2DMap(mapSizeX, mapSizeY);
-    wmap2 = create2DMap(mapSizeX, mapSizeY, 200);
+    // wmap2 = create2DMap(mapSizeX, mapSizeY, 200);
     // wmap = createCubeMap();
     
     mercMap = new MercatorMap(-(mapSizeX/2.0), -(mapSizeY/2.0), mapSizeX, mapSizeY, 85.0511, -85.0511, -180, 180); 
@@ -103,7 +103,7 @@ class WorldMap3D {
   
   void update() {
     shape(wmap);
-    shape(wmap2);
+    // shape(wmap2);
   }
   
   void setTint(int col, int al) {

@@ -38,18 +38,19 @@ class Cities {
   }
   
   Cities() {
-    int bs = 2;
+    int bs = 0;
     cities = new ArrayList<CityData>();
-    cities.add(new CityData("Berlin", new LatLong(52, 13),         #990000, bs, 400)); // Berlin
-    cities.add(new CityData("Sydney", new LatLong(-33.86, 151.21), #009900, bs, 200)); // Sydney
-    cities.add(new CityData("San Francisco", new LatLong(37.8, -122.4),   #000099, bs, 300)); // San Francisco
+    cities.add(new CityData("London", new LatLong(51.5002, -0.1262),         #FFFFFF, bs, 400)); 
+    //cities.add(new CityData("Berlin", new LatLong(52, 13),         #990000, bs, 400)); 
+    //cities.add(new CityData("Sydney", new LatLong(-33.86, 151.21), #009900, bs, 200)); 
+    //cities.add(new CityData("San Francisco", new LatLong(37.8, -122.4),   #000099, bs, 300)); 
     dbgMyName = this.getClass().getName() + "::";
   }
   
   void display(MercatorMap mm) {
     PVector cityXY;
     noStroke();
-    fill(255, 0, 0, 200);
+    fill(255, 0, 0, 100);
     translate(0, 0, 0.01);
     
     for (CityData cdata: cities) {
@@ -58,12 +59,12 @@ class Cities {
 
       pushMatrix();
       translate(cityXY.x, cityXY.y, cdata.getBS()/2);
-      fill(cdata.getColour());
+      fill(cdata.getColour(), 100);
       box(1,1,cdata.getBS());
       cdata.incBS();
       popMatrix();
 
-      dbgPrintCityLocation(cityLL, cityXY);
+      // dbgPrintCityLocation(cityLL, cityXY);
     }
     
   }
