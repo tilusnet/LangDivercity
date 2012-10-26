@@ -95,11 +95,11 @@ class UIManager {
   
   void positionOnLondon() {
     
-    offsX = 79;
-    offsY = 346;
-    rotX = 0.265;
-    rotY = -0.194;
-    zoomScale = 1.41;
+    offsX = -282;
+    offsY = 461;
+    rotX = -0.284;
+    rotY = 1.086;
+    zoomScale = 2.818;
   
     update();
   } 

@@ -19,9 +19,9 @@ class City {
         // Note: this comparator imposes orderings that are inconsistent with equals.    
         public int compare(String a, String b) {
             if (base.get(a) >= base.get(b)) {
-                return 1;
-            } else {
                 return -1;
+            } else {
+                return 1;
             } // returning 0 would merge keys
         }
     }    
@@ -49,6 +49,10 @@ class City {
       this.country = "";
     }
     
+    String getCityName() {
+      return name;
+    }
+
     LatLong getLocation() {
       return loc;
     }
@@ -87,6 +91,7 @@ class City {
         currOccurr = 0; 
       }
       langCount.put(langId, currOccurr + count);
+      langCountSorted.clear();
       langCountSorted.putAll(langCount);
     }
     
