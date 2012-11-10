@@ -1,11 +1,13 @@
 class WorldMap3D {
   private PImage tex;
-  private PShape wmap, wmap2;
   private int mapBitmapSizeX;
   private MercatorMap mercMap; 
+  private int mapSizeX, mapSizeY;
   
   
   WorldMap3D(int mapSizeX, int mapSizeY, int mapBitmapSizeX) {
+    this.mapSizeX = mapSizeX;
+    this.mapSizeY = mapSizeY;
     this.mapBitmapSizeX = mapBitmapSizeX;
 
     String fileExt = "png";
@@ -24,7 +26,7 @@ class WorldMap3D {
     tex = loadImage(pathPfx + mapBitmapSizeX + "." + fileExt);
     
     textureMode(NORMAL);
-    wmap = create2DMap(mapSizeX, mapSizeY);
+    draw2DMap(mapSizeX, mapSizeY);
     // wmap2 = create2DMap(mapSizeX, mapSizeY, 200);
     // wmap = createCubeMap();
     
@@ -36,78 +38,76 @@ class WorldMap3D {
     this(mapSizeX, mapSizeY, 4000);
   }
 
-  private PShape create2DMap(int mapSizeX, int mapSizeY) {
-    return create2DMap(mapSizeX, mapSizeY, 0);
+  private void draw2DMap(int mapSizeX, int mapSizeY) {
+    draw2DMap(mapSizeX, mapSizeY, 0);
   }
 
 
-  private PShape create2DMap(int mapSizeX, int mapSizeY, int zCoord) {
-    PShape m2d = createShape(QUADS);
+  private void draw2DMap(int mapSizeX, int mapSizeY, int zCoord) {
     float halfX = mapSizeX/2.0;
     float halfY = mapSizeY/2.0;
-    m2d.texture(tex);
-    m2d.vertex(-halfX, -halfY,  zCoord,   0,   0);
-    m2d.vertex( halfX, -halfY,  zCoord,   1,   0);
-    m2d.vertex( halfX,  halfY,  zCoord,   1,   1);
-    m2d.vertex(-halfX,  halfY,  zCoord,   0,   1);
-    m2d.end(CLOSE);
-    
-    return m2d;
+
+    beginShape(QUADS);
+    texture(tex);
+    vertex(-halfX, -halfY,  zCoord,   0,   0);
+    vertex( halfX, -halfY,  zCoord,   1,   0);
+    vertex( halfX,  halfY,  zCoord,   1,   1);
+    vertex(-halfX,  halfY,  zCoord,   0,   1);
+    endShape();
   }
 
-  private PShape createCubeMap() {
-    PShape mc = createShape(QUADS);
-    mc.noStroke();
-    mc.texture(tex);
+  private void drawCubeMap() {
+    noStroke();
+
+    beginShape(QUADS);
+    texture(tex);
     
     // +Z "front" face
-    mc.vertex(-1, -1,  1, 0, 0);
-    mc.vertex( 1, -1,  1, 1, 0);
-    mc.vertex( 1,  1,  1, 1, 1);
-    mc.vertex(-1,  1,  1, 0, 1);
+    vertex(-1, -1,  1, 0, 0);
+    vertex( 1, -1,  1, 1, 0);
+    vertex( 1,  1,  1, 1, 1);
+    vertex(-1,  1,  1, 0, 1);
   
     // -Z "back" face
-    mc.vertex( 1, -1, -1, 0, 0);
-    mc.vertex(-1, -1, -1, 1, 0);
-    mc.vertex(-1,  1, -1, 1, 1);
-    mc.vertex( 1,  1, -1, 0, 1);
+    vertex( 1, -1, -1, 0, 0);
+    vertex(-1, -1, -1, 1, 0);
+    vertex(-1,  1, -1, 1, 1);
+    vertex( 1,  1, -1, 0, 1);
   
     // +Y "bottom" face
-    mc.vertex(-1,  1,  1, 0, 0);
-    mc.vertex( 1,  1,  1, 1, 0);
-    mc.vertex( 1,  1, -1, 1, 1);
-    mc.vertex(-1,  1, -1, 0, 1);
+    vertex(-1,  1,  1, 0, 0);
+    vertex( 1,  1,  1, 1, 0);
+    vertex( 1,  1, -1, 1, 1);
+    vertex(-1,  1, -1, 0, 1);
   
     // -Y "top" face
-    mc.vertex(-1, -1, -1, 0, 0);
-    mc.vertex( 1, -1, -1, 1, 0);
-    mc.vertex( 1, -1,  1, 1, 1);
-    mc.vertex(-1, -1,  1, 0, 1);
+    vertex(-1, -1, -1, 0, 0);
+    vertex( 1, -1, -1, 1, 0);
+    vertex( 1, -1,  1, 1, 1);
+    vertex(-1, -1,  1, 0, 1);
   
     // +X "right" face
-    mc.vertex( 1, -1,  1, 0, 0);
-    mc.vertex( 1, -1, -1, 1, 0);
-    mc.vertex( 1,  1, -1, 1, 1);
-    mc.vertex( 1,  1,  1, 0, 1);
+    vertex( 1, -1,  1, 0, 0);
+    vertex( 1, -1, -1, 1, 0);
+    vertex( 1,  1, -1, 1, 1);
+    vertex( 1,  1,  1, 0, 1);
   
     // -X "left" face
-    mc.vertex(-1, -1, -1, 0, 0);
-    mc.vertex(-1, -1,  1, 1, 0);
-    mc.vertex(-1,  1,  1, 1, 1);
-    mc.vertex(-1,  1, -1, 0, 1);
+    vertex(-1, -1, -1, 0, 0);
+    vertex(-1, -1,  1, 1, 0);
+    vertex(-1,  1,  1, 1, 1);
+    vertex(-1,  1, -1, 0, 1);
     
-    mc.end(CLOSE);
-    
-    return mc;
+    endShape();
   }
   
   void update() {
-    shape(wmap);
-    // shape(wmap2);
+    draw2DMap(mapSizeX, mapSizeY);
   }
   
   void setTint(int col, int al) {
-    wmap.tint(col, al);
+    tint(col, al);
+    draw2DMap(mapSizeX, mapSizeY);
   }
   
   int getMapBitmapSizeX() {

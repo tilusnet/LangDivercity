@@ -21,12 +21,10 @@ int drawAreaSizeY = drawAreaSizeX;
 
 
 void setup() {
-  size(screenSizeX, screenSizeY, OPENGL);
+  size(screenSizeX, screenSizeY, P3D);
   colorMode(HSB, 360, 100, 100);
   myFont = createFont("CharterBT-Bold-48",48,true);
   smooth();
-  
-  hint(ENABLE_STROKE_PERSPECTIVE);
   
   myUim = new UIManager(drawAreaSizeX, drawAreaSizeY);
   myMap = new WorldMap3D(drawAreaSizeX, drawAreaSizeY, 4000);
