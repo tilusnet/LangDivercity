@@ -55,13 +55,15 @@ class UIManager {
   }
   
   void mouseWheel(int delta) {
+    loop();
+    
     //int zoomcoeff = 1 * (1 + abs(zoomScale) / 400); 
     float zoomcoeff = 0.05;
     zoomExp -= (delta * zoomcoeff);
     zoomScale = pow(10, zoomExp);
     
-    // println("zoomScale = " + zoomScale);
-    // println("mouse has moved by " + delta + " units."); 
+    if (dbgZoom) println("zoomScale = " + zoomScale);
+    if (dbgZoom) println("mouse has moved by " + delta + " units."); 
   }  
   
   void dbgPrintMyStats() {

@@ -3,8 +3,9 @@ import processing.opengl.*;
 
 float ts;
 boolean debug = false;
-boolean dbgRenderTime = true;
+boolean dbgRenderTime = false;
 boolean dbgRenderTime2 = false;
+boolean dbgZoom = true;
 int datactr = 0;
 int drawctr = 0;
 int drawnBars = 0;
