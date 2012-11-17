@@ -1,8 +1,11 @@
+import processing.opengl.*;
 
 
+float ts;
 boolean debug = false;
 int datactr = 0;
 int drawctr = 0;
+int drawnBars = 0;
 boolean datadone = false;
 
 UIManager   myUim;
@@ -10,8 +13,9 @@ WorldMap3D  myMap;
 MercatorMap mercMap;
 // Cities      myCities;
 Map<String,City>      myCities;
-skDB        mySkDB;
-LangID      myLangId;
+Map<String,Language>  myLanguages;
+skDB        mySkDB, myLangDB;
+
 PFont       myFont;
 
 int screenSizeX = 1600;
@@ -21,7 +25,7 @@ int drawAreaSizeY = drawAreaSizeX;
 
 
 void setup() {
-  size(screenSizeX, screenSizeY, P3D);
+  size(screenSizeX, screenSizeY, OPENGL);
   colorMode(HSB, 360, 100, 100);
   myFont = createFont("CharterBT-Bold-48",48,true);
   smooth();
@@ -29,7 +33,7 @@ void setup() {
   myUim = new UIManager(drawAreaSizeX, drawAreaSizeY);
   myMap = new WorldMap3D(drawAreaSizeX, drawAreaSizeY, 4000);
   myCities = new HashMap<String,City>();
-  myLangId = new LangID(this);
+  myLanguages = new HashMap<String,Language>();
   
   // myUim.positionOnEurope(myMap.getMapSizeX());
   myUim.positionOnLondon();
@@ -38,14 +42,14 @@ void setup() {
   mercMap = myMap.getMercatorMap();
 
   println("Loading data...");  
+  ts = millis();
   mySkDB = new skDB(this, "skdownl-ip.sqlite");
   mySkDB.query("SELECT ts,lang_id,country_code,country_name,city,latitude,longitude FROM combo WHERE city <> ''");
   // mySkDB.query("SELECT * from sk_data as s LEFT JOIN ip_group_city as i ON s.ip_start=i.ip_start WHERE city <> ''"); 
-  println("Data loaded.");
+  println("City data loaded in " + (millis() - ts)/1000 + " s.");
   
-  // println(myLangId.getColourHue("da_DK"));
-  
-  // draw_once();
+  myLangDB = new skDB(this, "skdownl-ip.sqlite");
+  myLangDB.query("SELECT lang_id,latitude,longitude,hue FROM languages");
   
 }
 
@@ -53,6 +57,18 @@ void setup() {
 
 
 void readdata() {
+  
+  ts = millis();
+  while (myLangDB.next()) {
+    String cLangId = myLangDB.getString("lang_id");
+    float cLat = myLangDB.getFloat("latitude");
+    float cLong = myLangDB.getFloat("longitude");
+    int cHue = Integer.parseInt(myLangDB.getString("hue"));
+    myLanguages.put(cLangId, new Language(cLangId, new LatLong(cLat, cLong), cHue));
+  }
+  println("Language data loaded in " + (millis() - ts)/1000 + " s.");
+  
+  
   int atOnceCtr = 5000;
   while (mySkDB.next()) {
     atOnceCtr--;
@@ -90,6 +106,8 @@ void render() {
 
   // println("!!!!");
   Iterator entries = myCities.entrySet().iterator();
+  int ctr = 0;
+  float ts_loc;
   
   while (entries.hasNext()) {
   // for (Map.Entry<String,City> entry : myCities.entrySet()) {
@@ -98,7 +116,12 @@ void render() {
     // TODO print city
     City city = (City)entry.getValue();
     
+    // ts_loc = millis();
     renderCityBar(city);
+    // println(" CityBarRender =  " + (millis() - ts_loc) + " ms.");
+    
+    
+    // if (++ctr > 100) break; 
     
   }
 }
@@ -106,6 +129,12 @@ void render() {
 void draw() {
   background(0);
   noStroke();
+
+  printRenderedBarNum(drawnBars);
+  printFPS();  
+
+  drawnBars = 0;
+
 /*
   fill(0,0,99);
   textFont(myFont,16);        
@@ -113,18 +142,26 @@ void draw() {
   text("Dummy",100,180);
  */ 
 
-  long st, el;
-  st = System.currentTimeMillis();    
-  
+  ts = millis();
   myUim.update();
-  readdata();
-  // println("@@ " + drawctr);
-  if (++drawctr % 1 == 0) render();
-  // if (datadone) render();
-  myMap.update();
+  println("UiM =  " + (int)(millis() - ts) + " ms.");
   
-  el = System.currentTimeMillis() - st;
-  // println(String.format("Draw runtime = %d min %02d.%03d sec", el/1000/60, (el / 1000) % 60 , el % 1000));    
+  ts = millis();
+  readdata();
+  println("Readdata =  " + (int)(millis() - ts) + " ms.");
+  
+  // println("@@ " + drawctr);
+  ts = millis();
+  if (++drawctr % 1 == 0) render();
+  println("Render =  " + (int)(millis() - ts) + " ms.");
+  // if (datadone) render();
+  
+  ts = millis();
+  myMap.update();
+  println("MapRender =  " + (int)(millis() - ts) + " ms.");
+  
+  // el = System.currentTimeMillis() - st;
+  // println(String.format("Draw runtime = %d min %02d.%03d sec", el/1000/60, (el / 1000) % 60 , el % 1000));  
 }
 
 void mouseDragged() {
@@ -137,43 +174,66 @@ void renderCityBar(City city) {
   int barBase = 0;
   int iStop = 20000, oStop = 500;
   boolean b = false; // = city.getCityName().equals("London");
+  PVector pvCityLL = new PVector();
+  int cnt = 0;
 
   Iterator entries = city.getLangCountsSorted().entrySet().iterator();
   
   if (b)       println("~~~");
+  
+  strokeWeight(4);
   while (entries.hasNext()) {
+    ++cnt;
   // for (Map.Entry<String,Integer> entry : city.getLangCountsSorted().entrySet()) {
     Map.Entry entry = (Map.Entry) entries.next();
     String langId = (String)entry.getKey();
     int langCount = (Integer)entry.getValue();
+
     if (b) {
       println(langId + ':' + langCount);
     }
-  
+
     LatLong cityLL = city.getLocation();
-    PVector cityXY = mercMap.getScreenLocation(new PVector(cityLL.getLat(), cityLL.getLong()));
-    
+    pvCityLL.set(cityLL.getLat(), cityLL.getLong(), 0.0); // don't care about z
+    PVector cityXY = mercMap.getScreenLocation(pvCityLL);
+
+
     pushMatrix();
     int barHeightCentre = barBase + langCount/2;
-    
-    translate(cityXY.x, cityXY.y, map(barHeightCentre, 0, iStop, 0, oStop));
+    int barHeight = barBase;
+        
+    translate(cityXY.x, cityXY.y, map(barHeight, 0, iStop, 0, oStop));
+    // translate(cityXY.x, cityXY.y, map(barHeightCentre, 0, iStop, 0, oStop));
+
     if (city.getCountry().equals(langId.substring(3,4))) {
-      fill(0, 0, 99); // white
+      stroke(0, 0, 99); // white
+      // fill(0, 0, 99); // white
     } else {
-      int colHue = myLangId.getColourHue(langId);
-      fill(colHue, 50, 50);
+      int colHue = myLanguages.get(langId).getColourHue();
+      stroke(colHue, 50, 50);
+      // fill(colHue, 50, 50);
     }
 
-    box(1,1,map(langCount, 0, iStop, 0, oStop));
+    line(0,0,0, 0,0, map(langCount, 0, iStop, 0, oStop));
+    // box(1,1,map(langCount, 0, iStop, 0, oStop));
+    drawnBars++;
     // cdata.incBS();
+
     popMatrix();
 
     barBase += langCount;
+    
+    /*
+    if (city.getCityName().equals("Budapest")) {
+      println("  [" + langId + "] = " + langCount);
+    }
+    */
+  
   }
-
   
+  strokeWeight(1);
 
-  
+  // println(String.format(" %40s - %d languages.", city.getCityName(), cnt));
 }
 
 void dbgPrintMem() {
@@ -184,5 +244,17 @@ void dbgPrintMem() {
 }
 
 
+void printFPS() {
+  // oversampled fonts tend to look better
+  textFont(myFont,18);
+  // white float frameRate
+  fill(255);
+  text("fps = " + (int)frameRate,20,120);
+}
   
-  
+void printRenderedBarNum(int num) {
+  textFont(myFont,18);
+  fill(255);
+  text("bars = " + num,20,270);
+}
+

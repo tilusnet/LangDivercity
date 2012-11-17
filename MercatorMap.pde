@@ -86,6 +86,11 @@ public class MercatorMap {
     return new PVector(getScreenX(longitudeInDegrees), getScreenY(latitudeInDegrees));
   }
 
+  public void getScreenLocation(PVector geoLocation, PVector xyLocation) {
+    xyLocation.x = getScreenX(geoLocation.y); // longitude
+    xyLocation.y = getScreenY(geoLocation.x); // latitude
+  }
+
   private float getScreenYRelative(float latitudeInDegrees) {
     return log(tan(latitudeInDegrees / 360f * PI + PI / 4));
   }
