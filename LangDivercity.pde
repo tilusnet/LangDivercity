@@ -3,6 +3,8 @@ import processing.opengl.*;
 
 float ts;
 boolean debug = false;
+boolean dbgRenderTime = true;
+boolean dbgRenderTime2 = false;
 int datactr = 0;
 int drawctr = 0;
 int drawnBars = 0;
@@ -26,7 +28,7 @@ int drawAreaSizeY = drawAreaSizeX;
 
 void setup() {
   size(screenSizeX, screenSizeY, OPENGL);
-  colorMode(HSB, 360, 100, 100);
+  colorMode(HSB, 360, 100, 100, 100);
   myFont = createFont("CharterBT-Bold-48",48,true);
   smooth();
   
@@ -37,7 +39,7 @@ void setup() {
   
   // myUim.positionOnEurope(myMap.getMapSizeX());
   myUim.positionOnLondon();
-  myMap.setTint(255, 150);
+  myMap.setTint(255, 60);
   
   mercMap = myMap.getMercatorMap();
 
@@ -66,7 +68,7 @@ void readdata() {
     int cHue = Integer.parseInt(myLangDB.getString("hue"));
     myLanguages.put(cLangId, new Language(cLangId, new LatLong(cLat, cLong), cHue));
   }
-  println("Language data loaded in " + (millis() - ts)/1000 + " s.");
+  if (dbgRenderTime) println("Language data loaded in " + (millis() - ts)/1000 + " s.");
   
   
   int atOnceCtr = 5000;
@@ -87,7 +89,7 @@ void readdata() {
       } else {
         // println(cityName + ": no");
         LatLong cityLatLong = new LatLong(mySkDB.getFloat("latitude"), mySkDB.getFloat("longitude"));
-        City city = new City(cCityName, cityLatLong, mySkDB.getString("country_code"));
+        City city = new City(cCityName, cityLatLong, mySkDB.getString("country_code"), mercMap);
         myCities.put(cCityName, city);
       }
 
@@ -116,9 +118,9 @@ void render() {
     // TODO print city
     City city = (City)entry.getValue();
     
-    // ts_loc = millis();
+    ts_loc = millis();
     renderCityBar(city);
-    // println(" CityBarRender =  " + (millis() - ts_loc) + " ms.");
+    if (dbgRenderTime2) println(" CityBarRender =  " + (millis() - ts_loc) + " ms.");
     
     
     // if (++ctr > 100) break; 
@@ -144,27 +146,30 @@ void draw() {
 
   ts = millis();
   myUim.update();
-  println("UiM =  " + (int)(millis() - ts) + " ms.");
+  if (dbgRenderTime) println("UiM =  " + (int)(millis() - ts) + " ms.");
   
   ts = millis();
   readdata();
-  println("Readdata =  " + (int)(millis() - ts) + " ms.");
+  if (dbgRenderTime) println("Readdata =  " + (int)(millis() - ts) + " ms.");
   
   // println("@@ " + drawctr);
   ts = millis();
   if (++drawctr % 1 == 0) render();
-  println("Render =  " + (int)(millis() - ts) + " ms.");
+  if (dbgRenderTime) println("Render =  " + (int)(millis() - ts) + " ms.");
   // if (datadone) render();
   
   ts = millis();
   myMap.update();
-  println("MapRender =  " + (int)(millis() - ts) + " ms.");
+  if (dbgRenderTime) println("MapRender =  " + (int)(millis() - ts) + " ms.");
   
   // el = System.currentTimeMillis() - st;
   // println(String.format("Draw runtime = %d min %02d.%03d sec", el/1000/60, (el / 1000) % 60 , el % 1000));  
+  
+  if (datadone) noLoop();
 }
 
 void mouseDragged() {
+  loop();
   myUim.mouseDragged();
 }
 
@@ -188,15 +193,11 @@ void renderCityBar(City city) {
     Map.Entry entry = (Map.Entry) entries.next();
     String langId = (String)entry.getKey();
     int langCount = (Integer)entry.getValue();
+    PVector cityXY = city.getXYLocation();
 
     if (b) {
       println(langId + ':' + langCount);
     }
-
-    LatLong cityLL = city.getLocation();
-    pvCityLL.set(cityLL.getLat(), cityLL.getLong(), 0.0); // don't care about z
-    PVector cityXY = mercMap.getScreenLocation(pvCityLL);
-
 
     pushMatrix();
     int barHeightCentre = barBase + langCount/2;
@@ -204,13 +205,13 @@ void renderCityBar(City city) {
         
     translate(cityXY.x, cityXY.y, map(barHeight, 0, iStop, 0, oStop));
     // translate(cityXY.x, cityXY.y, map(barHeightCentre, 0, iStop, 0, oStop));
-
-    if (city.getCountry().equals(langId.substring(3,4))) {
-      stroke(0, 0, 99); // white
+    
+    if (city.getCountry().equals(langId.substring(3,5))) {
+      stroke(0, 0, 99, 20); // white
       // fill(0, 0, 99); // white
     } else {
       int colHue = myLanguages.get(langId).getColourHue();
-      stroke(colHue, 50, 50);
+      stroke(colHue, 99, 66);
       // fill(colHue, 50, 50);
     }
 

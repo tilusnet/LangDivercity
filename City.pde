@@ -1,6 +1,7 @@
 class City {
     private String name;
-    private LatLong loc;
+    private LatLong locGeo;
+    private PVector locXY;
     String country;
     Map<String,Integer> langCount;
     Map<String,Integer> langCountSorted;
@@ -27,10 +28,11 @@ class City {
     }    
     
     
-    City(String name, LatLong loc, String country) {
+    City(String name, LatLong loc, String country, MercatorMap mm) {
       this.name = name;
-      this.loc = loc;
-      this.country = "";
+      this.locGeo = loc;
+      this.locXY = new PVector(mm.getScreenX(locGeo.getLong()), mm.getScreenY(locGeo.getLat()));
+      this.country = country;
       this.langCount = new HashMap<String,Integer>();
       this.langCountSorted = new TreeMap<String,Integer>(new ValueComparator(this.langCount));
 
@@ -39,24 +41,19 @@ class City {
       this.maxBs = 400;
     }
 
-// Old stuff    
-    City(String name, LatLong loc, color col, int barSize, int maxBarSize) {
-      this.name = name;
-      this.loc = loc;
-      this.col = col;
-      this.bs = barSize;
-      this.maxBs = maxBarSize;
-      this.country = "";
-    }
     
     String getCityName() {
       return name;
     }
 
-    LatLong getLocation() {
-      return loc;
+    LatLong getGeoLocation() {
+      return locGeo;
     }
     
+    PVector getXYLocation() {
+      return locXY;
+    }
+      
     String getCountry() {
       return country;
     }
