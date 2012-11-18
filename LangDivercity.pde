@@ -1,3 +1,8 @@
+import peasy.test.*;
+import peasy.org.apache.commons.math.*;
+import peasy.*;
+import peasy.org.apache.commons.math.geometry.*;
+
 import processing.opengl.*;
 
 
@@ -11,7 +16,8 @@ int drawctr = 0;
 int drawnBars = 0;
 boolean datadone = false;
 
-UIManager   myUim;
+// UIManager   myUim;
+PeasyCam myUim;
 WorldMap3D  myMap;
 MercatorMap mercMap;
 // Cities      myCities;
@@ -33,13 +39,26 @@ void setup() {
   myFont = createFont("CharterBT-Bold-48",48,true);
   smooth();
   
-  myUim = new UIManager(drawAreaSizeX, drawAreaSizeY);
+  // myUim = new UIManager(drawAreaSizeX, drawAreaSizeY);
+  myUim = new PeasyCam(this, 500);
+  myUim.setMinimumDistance(0);
+  // myUim.setYawRotationMode();
+  // reassign particular drag gestures, or set them to null; more: http://mrfeinberg.com/peasycam
+  myUim.setCenterDragHandler(null);
+  myUim.setRightDragHandler(myUim.getPanDragHandler());
+  myUim.setWheelHandler(new PeasyWheelHandler() {
+    public void handleWheel(final int delta) {
+      loop();
+      myUim.getZoomWheelHandler().handleWheel(delta);
+    }
+  });
+  
   myMap = new WorldMap3D(drawAreaSizeX, drawAreaSizeY, 4000);
   myCities = new HashMap<String,City>();
   myLanguages = new HashMap<String,Language>();
   
   // myUim.positionOnEurope(myMap.getMapSizeX());
-  myUim.positionOnLondon();
+  //myUim.positionOnLondon();
   myMap.setTint(255, 60);
   
   mercMap = myMap.getMercatorMap();
@@ -146,7 +165,7 @@ void draw() {
  */ 
 
   ts = millis();
-  myUim.update();
+  // myUim.update();
   if (dbgRenderTime) println("UiM =  " + (int)(millis() - ts) + " ms.");
   
   ts = millis();
@@ -171,7 +190,7 @@ void draw() {
 
 void mouseDragged() {
   loop();
-  myUim.mouseDragged();
+  // myUim.mouseDragged();
 }
 
 
