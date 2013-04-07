@@ -42,7 +42,8 @@ class WorldMap3D {
 
 
   private PShape create2DMap(int mapSizeX, int mapSizeY, int zCoord) {
-    PShape m2d = createShape(QUADS);
+    PShape m2d = createShape();
+    m2d.beginShape(QUADS);
     float halfX = mapSizeX/2.0;
     float halfY = mapSizeY/2.0;
     m2d.texture(tex);
@@ -50,13 +51,15 @@ class WorldMap3D {
     m2d.vertex( halfX, -halfY,  zCoord,   1,   0);
     m2d.vertex( halfX,  halfY,  zCoord,   1,   1);
     m2d.vertex(-halfX,  halfY,  zCoord,   0,   1);
-    m2d.end(CLOSE);
+    m2d.endShape();
     
     return m2d;
   }
 
   private PShape createCubeMap() {
-    PShape mc = createShape(QUADS);
+    PShape mc = createShape();
+    mc.beginShape(QUADS);
+    
     mc.noStroke();
     mc.texture(tex);
     
@@ -96,7 +99,7 @@ class WorldMap3D {
     mc.vertex(-1,  1,  1, 1, 1);
     mc.vertex(-1,  1, -1, 0, 1);
     
-    mc.end(CLOSE);
+    mc.endShape();
     
     return mc;
   }
